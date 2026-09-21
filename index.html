@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Search Visualization</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #222;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .array {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 40px 0 15px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            width: 65px;
+            height: 65px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            background: #eee;
+            transition: 0.4s;
+        }
+
+        .low {
+            background: #8ecae6;
+        }
+
+        .mid {
+            background: #ffb703;
+            transform: scale(1.1);
+        }
+
+        .high {
+            background: #90be6d;
+        }
+
+        .found {
+            background: #06d6a0;
+            color: white;
+            transform: scale(1.15);
+        }
+
+        .labels {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px;
+        }
+
+        input {
+            padding: 10px;
+            width: 100px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        button {
+            padding: 11px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #333;
+            color: white;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        #status {
+            font-size: 18px;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+
+        .formula {
+            margin-top: 25px;
+            padding: 15px;
+            background: #eee;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Binary Search Visualization</h1>
+
+    <p>Enter a number to search:</p>
+
+    <input type="number" id="target" value="70">
+
+    <button onclick="startSearch()">Search</button>
+    <button onclick="resetSearch()">Reset</button>
+
+    <div class="array" id="array"></div>
+
+    <div class="labels">
+        <span>🔵 LOW</span>
+        <span>🟡 MID</span>
+        <span>🟢 HIGH</span>
+    </div>
+
+    <div class="formula">
+        mid = low + (high - low) // 2
+    </div>
+
+    <div id="status">
+        Enter a value and click Search.
+    </div>
+
+</div>
+
+<script>
+
+const arr = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+
+let low;
+let high;
+let target;
+let timer;
+
+function displayArray(mid = -1, found = -1) {
+
+    const container = document.getElementById("array");
+
+    container.innerHTML = "";
+
+    arr.forEach((value, index) => {
+
+        const box = document.createElement("div");
+
+        box.className = "box";
+
+        box.textContent = value;
+
+        if (index === found) {
+            box.classList.add("found");
+        }
+        else if (index === mid) {
+            box.classList.add("mid");
+        }
+        else if (index === low) {
+            box.classList.add("low");
+        }
+        else if (index === high) {
+            box.classList.add("high");
+        }
+
+        container.appendChild(box);
+    });
+}
+
+
+function startSearch() {
+
+    clearInterval(timer);
+
+    target = Number(document.getElementById("target").value);
+
+    low = 0;
+    high = arr.length - 1;
+
+    let step = 0;
+
+    timer = setInterval(() => {
+
+        if (low > high) {
+
+            clearInterval(timer);
+
+            displayArray();
+
+            document.getElementById("status").textContent =
+                "❌ Element not found.";
+
+            return;
+        }
+
+        let mid = low + Math.floor((high - low) / 2);
+
+        displayArray(mid);
+
+        document.getElementById("status").textContent =
+            `Step ${++step}: LOW = ${low}, MID = ${mid}, HIGH = ${high}`;
+
+        if (arr[mid] === target) {
+
+            clearInterval(timer);
+
+            displayArray(mid, mid);
+
+            document.getElementById("status").textContent =
+                `✅ ${target} found at index ${mid}!`;
+
+        }
+
+        else if (arr[mid] < target) {
+
+            low = mid + 1;
+
+        }
+
+        else {
+
+            high = mid - 1;
+
+        }
+
+    }, 1200);
+}
+
+
+function resetSearch() {
+
+    clearInterval(timer);
+
+    low = 0;
+    high = arr.length - 1;
+
+    displayArray();
+
+    document.getElementById("status").textContent =
+        "Enter a value and click Search.";
+}
+
+resetSearch();
+
+</script>
+
+</body>
+</html>
